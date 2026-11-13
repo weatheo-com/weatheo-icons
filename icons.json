@@ -368,5 +368,444 @@
       761,
       762
     ]
+  },
+  {
+    "name": "moon-new",
+    "title": "New moon",
+    "category": "moon",
+    "tags": [
+      "moon",
+      "moon phase",
+      "lunar",
+      "new"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "moon-waxing-crescent",
+    "title": "Waxing crescent moon",
+    "category": "moon",
+    "tags": [
+      "moon",
+      "moon phase",
+      "lunar",
+      "waxing",
+      "crescent"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "moon-first-quarter",
+    "title": "First quarter moon",
+    "category": "moon",
+    "tags": [
+      "moon",
+      "moon phase",
+      "lunar",
+      "first",
+      "quarter"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "moon-waxing-gibbous",
+    "title": "Waxing gibbous moon",
+    "category": "moon",
+    "tags": [
+      "moon",
+      "moon phase",
+      "lunar",
+      "waxing",
+      "gibbous"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "moon-full",
+    "title": "Full moon",
+    "category": "moon",
+    "tags": [
+      "moon",
+      "moon phase",
+      "lunar",
+      "full"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "moon-waning-gibbous",
+    "title": "Waning gibbous moon",
+    "category": "moon",
+    "tags": [
+      "moon",
+      "moon phase",
+      "lunar",
+      "waning",
+      "gibbous"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "moon-last-quarter",
+    "title": "Last quarter moon",
+    "category": "moon",
+    "tags": [
+      "moon",
+      "moon phase",
+      "lunar",
+      "last",
+      "quarter"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "moon-waning-crescent",
+    "title": "Waning crescent moon",
+    "category": "moon",
+    "tags": [
+      "moon",
+      "moon phase",
+      "lunar",
+      "waning",
+      "crescent"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "sunrise",
+    "title": "Sunrise",
+    "category": "astro",
+    "tags": [
+      "sunrise",
+      "dawn",
+      "sun",
+      "morning"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "sunset",
+    "title": "Sunset",
+    "category": "astro",
+    "tags": [
+      "sunset",
+      "dusk",
+      "sun",
+      "evening"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "moonrise",
+    "title": "Moonrise",
+    "category": "astro",
+    "tags": [
+      "moonrise",
+      "moon",
+      "night"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "moonset",
+    "title": "Moonset",
+    "category": "astro",
+    "tags": [
+      "moonset",
+      "moon",
+      "night"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "thermometer",
+    "title": "Thermometer",
+    "category": "measure",
+    "tags": [
+      "temperature",
+      "thermometer",
+      "heat"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "thermometer-warmer",
+    "title": "Temperature rising",
+    "category": "measure",
+    "tags": [
+      "temperature",
+      "warmer",
+      "rising",
+      "heat"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "thermometer-colder",
+    "title": "Temperature falling",
+    "category": "measure",
+    "tags": [
+      "temperature",
+      "colder",
+      "falling",
+      "cold"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "humidity",
+    "title": "Humidity",
+    "category": "measure",
+    "tags": [
+      "humidity",
+      "moisture",
+      "percent",
+      "drop"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "barometer",
+    "title": "Barometer",
+    "category": "measure",
+    "tags": [
+      "pressure",
+      "barometer",
+      "gauge",
+      "hpa"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "raindrop",
+    "title": "Raindrop",
+    "category": "measure",
+    "tags": [
+      "rain",
+      "precipitation",
+      "drop",
+      "raindrop"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "umbrella",
+    "title": "Umbrella",
+    "category": "measure",
+    "tags": [
+      "umbrella",
+      "rain",
+      "precipitation",
+      "protection"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "compass",
+    "title": "Wind direction",
+    "category": "measure",
+    "tags": [
+      "compass",
+      "wind direction",
+      "north",
+      "bearing"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "windsock",
+    "title": "Windsock",
+    "category": "measure",
+    "tags": [
+      "windsock",
+      "wind",
+      "wind speed",
+      "airfield"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "uv-low",
+    "title": "UV index low",
+    "category": "uv",
+    "tags": [
+      "uv",
+      "uv index",
+      "sun",
+      "ultraviolet",
+      "low"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "uv-moderate",
+    "title": "UV index moderate",
+    "category": "uv",
+    "tags": [
+      "uv",
+      "uv index",
+      "sun",
+      "ultraviolet",
+      "moderate"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "uv-high",
+    "title": "UV index high",
+    "category": "uv",
+    "tags": [
+      "uv",
+      "uv index",
+      "sun",
+      "ultraviolet",
+      "high"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "uv-very-high",
+    "title": "UV index very high",
+    "category": "uv",
+    "tags": [
+      "uv",
+      "uv index",
+      "sun",
+      "ultraviolet",
+      "very high"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "uv-extreme",
+    "title": "UV index extreme",
+    "category": "uv",
+    "tags": [
+      "uv",
+      "uv index",
+      "sun",
+      "ultraviolet",
+      "extreme"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "aqi-good",
+    "title": "Air quality good",
+    "category": "aqi",
+    "tags": [
+      "aqi",
+      "air quality",
+      "pollution",
+      "good"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "aqi-moderate",
+    "title": "Air quality moderate",
+    "category": "aqi",
+    "tags": [
+      "aqi",
+      "air quality",
+      "pollution",
+      "moderate"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "aqi-unhealthy-sensitive",
+    "title": "Air quality unhealthy for sensitive groups",
+    "category": "aqi",
+    "tags": [
+      "aqi",
+      "air quality",
+      "pollution",
+      "unhealthy",
+      "sensitive"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "aqi-unhealthy",
+    "title": "Air quality unhealthy",
+    "category": "aqi",
+    "tags": [
+      "aqi",
+      "air quality",
+      "pollution",
+      "unhealthy"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "aqi-very-unhealthy",
+    "title": "Air quality very unhealthy",
+    "category": "aqi",
+    "tags": [
+      "aqi",
+      "air quality",
+      "pollution",
+      "very",
+      "unhealthy"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "aqi-hazardous",
+    "title": "Air quality hazardous",
+    "category": "aqi",
+    "tags": [
+      "aqi",
+      "air quality",
+      "pollution",
+      "hazardous"
+    ],
+    "owm": [],
+    "owmIds": []
+  },
+  {
+    "name": "pollen",
+    "title": "Pollen",
+    "category": "pollen",
+    "tags": [
+      "pollen",
+      "allergy",
+      "hay fever",
+      "spring"
+    ],
+    "owm": [],
+    "owmIds": []
   }
 ]

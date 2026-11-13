@@ -186,6 +186,115 @@ export function dust(ctx, pts, { color = C.dust } = {}) {
   }).join('');
 }
 
+// Shared by the non-weather icons (moon phases, astro, measures, indices).
+const PIVOT = (x, y) => `transform-box:view-box;transform-origin:${x}px ${y}px;`;
+export const FONT = 'system-ui,-apple-system,Segoe UI,Roboto,sans-serif';
+
+/** Moon phase disc of radius r; p = phase 0..1 (0 new, .25 first quarter, .5 full, .75 last quarter).
+ *  Northern hemisphere: waxing is lit on the right. Faint full disc + pulsing halo. */
+export function moonPhase(ctx, { cx, cy, r, p }) {
+  css(ctx, 'glow', `.~glow{${FILLBOX}animation:~glow 4s ease-in-out infinite alternate}@keyframes ~glow{from{opacity:.08;transform:scale(.94)}to{opacity:.35;transform:scale(1.04)}}`);
+  let out = `<circle class="${ctx.p}glow" cx="${f(cx)}" cy="${f(cy)}" r="${f(r + 4)}" fill="${C.moonB}" opacity=".12"/>` +
+    `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="${C.darkB}" fill-opacity=".22" stroke="${C.darkB}" stroke-opacity=".55" stroke-width="1.5"/>`;
+  const fill = grad(ctx, 'moon', C.moonA, C.moonB, 'd');
+  if (Math.abs(p - 0.5) < 1e-6) return out + `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="${fill}" stroke="${C.moonB}" stroke-width="1.5"/>`;
+  if (p < 1e-6 || p > 1 - 1e-6) return out;
+  const waxing = p < 0.5, k = (1 - Math.cos(2 * Math.PI * p)) / 2;   // lit fraction
+  const rx = r * Math.abs(1 - 2 * k), crescent = k < 0.5;
+  const T = `${f(cx)} ${f(cy - r)}`, B = `${f(cx)} ${f(cy + r)}`;
+  // outer limb top -> bottom on the lit side, terminator bottom -> top
+  const outer = `A${f(r)} ${f(r)} 0 0 ${waxing ? 1 : 0} ${B}`;
+  const viaLit = crescent; // crescent: terminator bulges toward the lit side
+  const sweepT = waxing ? (viaLit ? 0 : 1) : (viaLit ? 1 : 0);
+  const term = rx < 0.05 ? `L${T}` : `A${f(rx)} ${f(r)} 0 0 ${sweepT} ${T}`;
+  return out + `<path d="M${T}${outer}${term}Z" fill="${fill}" stroke="${C.moonB}" stroke-width="1.5" stroke-linejoin="round"/>`;
+}
+
+/** Vertical arrow, tip at (x,y), pointing 'up' or 'down', length len. Nudges along its direction. */
+export function arrow(ctx, { x, y, dir = 'up', len = 10, color = C.line, w = 2.5 }) {
+  const s = dir === 'up' ? 1 : -1, h = len * 0.38;
+  css(ctx, 'ar', `.~ar{animation:~ar 1.6s ease-in-out infinite alternate}@keyframes ~ar{from{transform:translateY(${s * 1.5}px)}to{transform:translateY(${-s * 1.5}px)}}`);
+  const d = `M${f(x)} ${f(y + s * len)}V${f(y)}M${f(x - h)} ${f(y + s * h)}L${f(x)} ${f(y)}L${f(x + h)} ${f(y + s * h)}`;
+  return `<path class="${ctx.p}ar" d="${d}" fill="none" stroke="${color}" stroke-width="${f(w)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+
+/** Horizon at y with a sun or moon half-risen behind it, and an up/down arrow below. */
+export function horizon(ctx, { body, dir, y = 41 }) {
+  const id = ctx.p + 'hz';
+  ctx.defs.set(id, `<clipPath id="${id}"><rect x="0" y="0" width="64" height="${f(y - 1.5)}"/></clipPath>`);
+  const up = dir === 'up';
+  css(ctx, 'rise', `.~rise{animation:~rise 3.6s ease-in-out infinite}@keyframes ~rise{0%{transform:translateY(${up ? 5 : 0}px)}50%,70%{transform:translateY(${up ? 0 : 5}px)}100%{transform:translateY(${up ? 5 : 0}px)}}`);
+  let b;
+  if (body === 'sun') {
+    let d = '';
+    for (let i = 0; i < 5; i++) {
+      const a = Math.PI * (1.1 + i * 0.2), c = Math.cos(a), s = Math.sin(a);
+      d += `M${f(32 + c * 18)} ${f(y + s * 18)}L${f(32 + c * 25)} ${f(y + s * 25)}`;
+    }
+    b = `<path d="${d}" stroke="${C.ray}" stroke-width="3.5" stroke-linecap="round"/>` +
+      `<circle cx="32" cy="${f(y)}" r="13.5" fill="${grad(ctx, 'sun', C.sunA, C.sunB, 'd')}"/>`;
+  } else b = moon(ctx, { cx: 30, cy: y - 3, r: 17 }) + star(ctx, { cx: 51, cy: 12, s: 4 });
+  const col = body === 'sun' ? C.sunB : C.moonB;
+  return `<g clip-path="url(#${id})"><g class="${ctx.p}rise">${b}</g></g>` +
+    `<path d="M6 ${f(y)}H58" stroke="${C.line}" stroke-width="3" stroke-linecap="round"/>` +
+    arrow(ctx, { x: 32, y: up ? y + 7 : y + 19, dir, len: 12, color: col, w: 3 });
+}
+
+/** Thermometer centred on x: tube + bulb outline, mercury that rises and falls. */
+export function thermometer(ctx, { x = 32, from = '#F97316', to = '#EF4444', level = 20 }) {
+  const by = 46, br = 8.5, tw = 5, yi = by - Math.sqrt(br * br - tw * tw);
+  css(ctx, 'merc', `.~m{transform-box:fill-box;transform-origin:bottom;animation:~m 3s ease-in-out infinite alternate}@keyframes ~m{from{transform:scaleY(.82)}to{transform:scaleY(1)}}`);
+  const merc = grad(ctx, 'merc', from, to);
+  let ticks = '';
+  for (let i = 0; i < 4; i++) ticks += `M${f(x + 8)} ${f(14 + i * 6)}h${i % 2 ? 2.5 : 4}`;
+  return `<path d="M${f(x - tw)} ${f(yi)}V13A${tw} ${tw} 0 0 1 ${f(x + tw)} 13V${f(yi)}A${br} ${br} 0 1 1 ${f(x - tw)} ${f(yi)}Z" fill="#F8FAFC" stroke="${C.line}" stroke-width="2"/>` +
+    `<rect class="${ctx.p}m" x="${f(x - 2)}" y="${f(level)}" width="4" height="${f(by - level)}" rx="2" fill="${merc}"/>` +
+    `<circle cx="${f(x)}" cy="${by}" r="5.5" fill="${merc}"/>` +
+    `<path d="${ticks}" stroke="${C.line}" stroke-width="1.5" stroke-linecap="round"/>`;
+}
+
+/** Water drop with a top point at (cx, cy - 22). bob = gentle up/down. */
+export function waterDrop(ctx, { cx = 32, cy = 34, s = 1 }) {
+  const P = (a, b) => `${f(cx + a * s)} ${f(cy + b * s)}`;
+  css(ctx, 'bob', `.~bob{animation:~bob 2.4s ease-in-out infinite alternate}@keyframes ~bob{from{transform:translateY(-1.5px)}to{transform:translateY(1.5px)}}`);
+  return `<path d="M${P(0, -24)}C${P(-4, -17)} ${P(-15, -5)} ${P(-15, 6)}A${f(15 * s)} ${f(15 * s)} 0 0 0 ${P(15, 6)}C${P(15, -5)} ${P(4, -17)} ${P(0, -24)}Z" fill="${grad(ctx, 'drop', '#60A5FA', '#2563EB')}"/>`;
+}
+
+/** Needle gauge (barometer): dial, ticks, swaying needle. */
+export function gauge(ctx, { cx = 32, cy = 33, r = 23 }) {
+  css(ctx, 'sway', `.~ndl{${PIVOT(cx, cy)}animation:~sway 3.2s ease-in-out infinite alternate}@keyframes ~sway{from{transform:rotate(-14deg)}to{transform:rotate(10deg)}}`);
+  let t = '';
+  for (let i = 0; i <= 8; i++) {
+    const a = Math.PI * (0.83 + i * 0.1675), c = Math.cos(a), s = Math.sin(a), r1 = i % 2 ? r - 5 : r - 7;
+    t += `M${f(cx + c * r1)} ${f(cy + s * r1)}L${f(cx + c * (r - 3))} ${f(cy + s * (r - 3))}`;
+  }
+  return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${grad(ctx, 'dial', C.cloudA, C.cloudB)}" stroke="${C.line}" stroke-width="2.5"/>` +
+    `<path d="${t}" stroke="${C.line}" stroke-width="1.75" stroke-linecap="round"/>` +
+    `<path class="${ctx.p}ndl" d="M${cx - 1.8} ${cy}L${cx + 5} ${cy - 15}L${cx + 1.8} ${cy + 1}Z" fill="#EF4444" stroke="#EF4444" stroke-width="1.5" stroke-linejoin="round"/>` +
+    `<circle cx="${cx}" cy="${cy}" r="3.2" fill="${C.darkS}"/>` +
+    `<path d="M${cx - 8} ${cy + 12}h16" stroke="${C.darkB}" stroke-width="2.5" stroke-linecap="round"/>`;
+}
+
+/** Rounded badge with short text (UV level). */
+export function badge(ctx, { x, y, w, h, color, text, ink = '#fff', size = 17 }) {
+  return `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" rx="7" fill="${color}"/>` +
+    `<text x="${f(x + w / 2)}" y="${f(y + h / 2 + size * 0.36)}" fill="${ink}" font-family="${FONT}" font-size="${size}" font-weight="700" text-anchor="middle">${text}</text>`;
+}
+
+/** Pollen grain: spiky ball. i staggers the float. */
+export function pollenGrain(ctx, { cx, cy, r, i = 0 }) {
+  css(ctx, 'fl', `@keyframes ~fl{from{transform:translate(-1px,1.5px) rotate(-8deg)}to{transform:translate(1px,-1.5px) rotate(8deg)}}`);
+  css(ctx, 'pg' + i, `.~pg${i}{${FILLBOX}animation:~fl 3s ease-in-out ${f(-i * 1.1)}s infinite alternate}`);
+  let d = '';
+  for (let k = 0; k < 10; k++) {
+    const a = (k * Math.PI) / 5, c = Math.cos(a), s = Math.sin(a);
+    d += `M${f(cx + c * r)} ${f(cy + s * r)}L${f(cx + c * (r + r * 0.32))} ${f(cy + s * (r + r * 0.32))}`;
+  }
+  const dots = [[-0.35, -0.3], [0.3, -0.1], [-0.05, 0.38]].map(([a, b]) => `<circle cx="${f(cx + a * r)}" cy="${f(cy + b * r)}" r="${f(r * 0.14)}" fill="#65A30D"/>`).join('');
+  return `<g class="${ctx.p}pg${i}"><path d="${d}" stroke="#84CC16" stroke-width="${f(Math.max(1.5, r * 0.17))}" stroke-linecap="round"/>` +
+    `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="${grad(ctx, 'pol', '#FDE047', '#A3E635', 'd')}" stroke="#84CC16" stroke-width="1.5"/>${dots}</g>`;
+}
+
 // ---------------------------------------------------------------- icons
 
 // Layout helpers shared by the compositions.
@@ -238,6 +347,70 @@ export const ICONS = [
       dust(c, [[16, 31, 1.8], [26, 30, 1.4], [36, 32, 2], [47, 30, 1.5], [53, 36, 1.8], [22, 52, 1.5], [52, 50, 1.4]]) },
 ];
 
+// ---------------------------------------------------------------- more icons
+
+const PHASES = [['new', 'New moon', 0], ['waxing-crescent', 'Waxing crescent moon', 0.14], ['first-quarter', 'First quarter moon', 0.25],
+  ['waxing-gibbous', 'Waxing gibbous moon', 0.36], ['full', 'Full moon', 0.5], ['waning-gibbous', 'Waning gibbous moon', 0.64],
+  ['last-quarter', 'Last quarter moon', 0.75], ['waning-crescent', 'Waning crescent moon', 0.86]];
+for (const [n, title, p] of PHASES) ICONS.push({ name: 'moon-' + n, title, category: 'moon',
+  tags: ['moon', 'moon phase', 'lunar', ...n.split('-')], draw: (c) => moonPhase(c, { cx: 32, cy: 32, r: 20, p }) });
+
+ICONS.push(
+  { name: 'sunrise', title: 'Sunrise', category: 'astro', tags: ['sunrise', 'dawn', 'sun', 'morning'], draw: (c) => horizon(c, { body: 'sun', dir: 'up' }) },
+  { name: 'sunset', title: 'Sunset', category: 'astro', tags: ['sunset', 'dusk', 'sun', 'evening'], draw: (c) => horizon(c, { body: 'sun', dir: 'down' }) },
+  { name: 'moonrise', title: 'Moonrise', category: 'astro', tags: ['moonrise', 'moon', 'night'], draw: (c) => horizon(c, { body: 'moon', dir: 'up' }) },
+  { name: 'moonset', title: 'Moonset', category: 'astro', tags: ['moonset', 'moon', 'night'], draw: (c) => horizon(c, { body: 'moon', dir: 'down' }) },
+
+  { name: 'thermometer', title: 'Thermometer', category: 'measure', tags: ['temperature', 'thermometer', 'heat'], draw: (c) => thermometer(c, {}) },
+  { name: 'thermometer-warmer', title: 'Temperature rising', category: 'measure', tags: ['temperature', 'warmer', 'rising', 'heat'],
+    draw: (c) => thermometer(c, { x: 26, level: 16 }) + arrow(c, { x: 49, y: 12, dir: 'up', len: 14, color: '#EF4444', w: 3 }) },
+  { name: 'thermometer-colder', title: 'Temperature falling', category: 'measure', tags: ['temperature', 'colder', 'falling', 'cold'],
+    draw: (c) => thermometer(c, { x: 26, from: '#60A5FA', to: '#3B82F6', level: 30 }) + arrow(c, { x: 49, y: 30, dir: 'down', len: 14, color: '#3B82F6', w: 3 }) },
+  { name: 'humidity', title: 'Humidity', category: 'measure', tags: ['humidity', 'moisture', 'percent', 'drop'],
+    draw: (c) => `<g class="${c.p}bob">${waterDrop(c, { cy: 33 })}<circle cx="26.5" cy="35" r="3" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="37.5" cy="47" r="3" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M38.5 33L25.5 49" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></g>` },
+  { name: 'barometer', title: 'Barometer', category: 'measure', tags: ['pressure', 'barometer', 'gauge', 'hpa'], draw: (c) => gauge(c, {}) },
+  { name: 'raindrop', title: 'Raindrop', category: 'measure', tags: ['rain', 'precipitation', 'drop', 'raindrop'],
+    draw: (c) => `<g class="${c.p}bob">${waterDrop(c, { cy: 35 })}<path d="M23 40a9 9 0 0 0 5 8" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/></g>` },
+  { name: 'umbrella', title: 'Umbrella', category: 'measure', tags: ['umbrella', 'rain', 'precipitation', 'protection'],
+    draw: (c) => drops(c, [[16, 3], [30, 1], [46, 3]], { len: 6, w: 2.5 }) +
+      `<path d="M32 33V50a4 4 0 0 1-8 0" fill="none" stroke="${C.darkS}" stroke-width="2.5" stroke-linecap="round"/>` +
+      `<path d="M11 33A21 21 0 0 1 53 33Q47.75 28.5 42.5 33Q37.25 28.5 32 33Q26.75 28.5 21.5 33Q16.25 28.5 11 33Z" fill="${grad(c, 'umb', '#60A5FA', '#2563EB')}" stroke="#1D4ED8" stroke-width="1.5" stroke-linejoin="round"/>` +
+      `<path d="M32 13Q26 22 26.5 31M32 13Q38 22 37.5 31" fill="none" stroke="#1D4ED8" stroke-opacity=".45" stroke-width="1.25"/>` },
+  { name: 'compass', title: 'Wind direction', category: 'measure', tags: ['compass', 'wind direction', 'north', 'bearing'],
+    draw: (c) => {
+      css(c, 'wob', `.~ndl{transform-box:view-box;transform-origin:32px 32px;animation:~wob 2.6s ease-in-out infinite alternate}@keyframes ~wob{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}`);
+      return `<circle cx="32" cy="32" r="24" fill="${grad(c, 'dial', C.cloudA, C.cloudB)}" stroke="${C.line}" stroke-width="2.5"/>` +
+        `<path d="M32 8v4M56 32h-4M32 56v-4M8 32h4" stroke="${C.line}" stroke-width="2.5" stroke-linecap="round"/>` +
+        `<g class="${c.p}ndl"><path d="M32 12L38 32H26Z" fill="#EF4444"/><path d="M26 32H38L32 52Z" fill="${C.darkB}"/><circle cx="32" cy="32" r="2.5" fill="#fff"/></g>`;
+    } },
+  { name: 'windsock', title: 'Windsock', category: 'measure', tags: ['windsock', 'wind', 'wind speed', 'airfield'],
+    draw: (c) => {
+      css(c, 'sock', `.~sock{transform-box:view-box;transform-origin:16px 20px;animation:~sock 1.4s ease-in-out infinite alternate}@keyframes ~sock{from{transform:rotate(1deg) scaleX(1)}to{transform:rotate(7deg) scaleX(.94)}}`);
+      const seg = 4, x0 = 17, x1 = 54, t0 = 11, b0 = 29, t1 = 17, b1 = 25;
+      let s = '';
+      for (let i = 0; i < seg; i++) {
+        const a = i / seg, b = (i + 1) / seg, X = (u) => x0 + (x1 - x0) * u, T = (u) => t0 + (t1 - t0) * u, B = (u) => b0 + (b1 - b0) * u;
+        s += `<path d="M${f(X(a))} ${f(T(a))}L${f(X(b))} ${f(T(b))}V${f(B(b))}L${f(X(a))} ${f(B(a))}Z" fill="${i % 2 ? '#F8FAFC' : '#F97316'}"/>`;
+      }
+      return `<path d="M15 8V57" stroke="${C.darkS}" stroke-width="3" stroke-linecap="round"/>` +
+        `<g class="${c.p}sock">${s}<path d="M${x0} ${t0}L${x1} ${t1}V${b1}L${x0} ${b0}Z" fill="none" stroke="${C.darkS}" stroke-width="1.5" stroke-linejoin="round"/></g>`;
+    } },
+);
+
+const UV = [['low', 'UV index low', '#22C55E', '2'], ['moderate', 'UV index moderate', '#EAB308', '5'], ['high', 'UV index high', '#F97316', '7'],
+  ['very-high', 'UV index very high', '#EF4444', '9'], ['extreme', 'UV index extreme', '#8B5CF6', '11+']];
+for (const [n, title, color, text] of UV) ICONS.push({ name: 'uv-' + n, title, category: 'uv', tags: ['uv', 'uv index', 'sun', 'ultraviolet', n.replace('-', ' ')],
+  draw: (c) => sun(c, { cx: 25, cy: 25, r: 10.5 }) + badge(c, { x: 29, y: 35, w: 31, h: 24, color, text, ink: n === 'moderate' ? '#422006' : '#fff', size: text.length > 2 ? 15 : 18 }) });
+
+const AQI = [['good', 'Air quality good', '#22C55E'], ['moderate', 'Air quality moderate', '#EAB308'], ['unhealthy-sensitive', 'Air quality unhealthy for sensitive groups', '#F97316'],
+  ['unhealthy', 'Air quality unhealthy', '#EF4444'], ['very-unhealthy', 'Air quality very unhealthy', '#8B5CF6'], ['hazardous', 'Air quality hazardous', '#7F1D1D']];
+for (const [n, title, color] of AQI) ICONS.push({ name: 'aqi-' + n, title, category: 'aqi', tags: ['aqi', 'air quality', 'pollution', ...n.split('-')],
+  draw: (c) => `<rect x="8" y="8" width="48" height="48" rx="14" fill="${color}"/>` +
+    windLines(c, ['M17 25H37a5 5 0 1 0-5-5', 'M17 33H47', 'M17 41H35a5 5 0 1 1-5 5'], { color: '#fff', w: 3.5 }) });
+
+ICONS.push({ name: 'pollen', title: 'Pollen', category: 'pollen', tags: ['pollen', 'allergy', 'hay fever', 'spring'],
+  draw: (c) => pollenGrain(c, { cx: 25, cy: 25, r: 11, i: 0 }) + pollenGrain(c, { cx: 44, cy: 40, r: 9, i: 1 }) + pollenGrain(c, { cx: 21, cy: 49, r: 5.5, i: 2 }) });
+
 const REDUCE = '@media (prefers-reduced-motion:reduce){*{animation:none!important}}';
 
 /** Render one icon. key = prefix key (name, or OWM code for the copies). */
@@ -259,26 +432,34 @@ function write(rel, text) {
   fs.writeFileSync(p, text);
 }
 
-/** Contact sheet of static icons at 64 and 24 px, on light and dark panels. */
+/** Contact sheet of static icons at 64 and 24 px, on light and dark panels, grouped by category. */
 export function sheet(icons) {
-  const cols = 5, cw = 116, ch = 100, pad = 12;
-  const rows = Math.ceil(icons.length / cols);
-  const pw = cols * cw + pad * 2, ph = rows * ch + pad * 2;
+  const cols = 8, cw = 116, ch = 100, pad = 12, hh = 24;
+  const cats = [...new Set(icons.map((ic) => ic.category || 'weather'))];
+  const groups = cats.map((c) => [c, icons.filter((ic) => (ic.category || 'weather') === c)]);
+  const ph = pad * 2 + groups.reduce((n, [, g]) => n + hh + Math.ceil(g.length / cols) * ch, 0);
+  const pw = cols * cw + pad * 2;
   const syms = icons.map((ic) => {
     const s = render(ic, { animated: false, key: 'sheet-' + ic.name });
     const inner = s.replace(/^<svg[^>]*><title>[^<]*<\/title>/, '').replace(/<\/svg>\n$/, '');
     return `<symbol id="s-${ic.name}" viewBox="0 0 64 64">${inner}</symbol>`;
   }).join('');
   let out = '';
+  const T = 'font-family="Helvetica,Arial,sans-serif"';
   [['#ffffff', '#334155'], ['#0d1117', '#cbd5e1']].forEach(([bg, fg], k) => {
-    const oy = k * ph;
-    out += `<rect x="0" y="${oy}" width="${pw}" height="${ph}" fill="${bg}"/>`;
-    icons.forEach((ic, i) => {
-      const x = pad + (i % cols) * cw, y = oy + pad + Math.floor(i / cols) * ch;
-      out += `<use href="#s-${ic.name}" x="${x + 6}" y="${y + 6}" width="64" height="64"/>`;
-      out += `<use href="#s-${ic.name}" x="${x + 78}" y="${y + 26}" width="24" height="24"/>`;
-      out += `<text x="${x + cw / 2}" y="${y + 88}" fill="${fg}" font-family="Helvetica,Arial,sans-serif" font-size="11" text-anchor="middle">${ic.name}</text>`;
-    });
+    let y0 = k * ph + pad;
+    out += `<rect x="0" y="${k * ph}" width="${pw}" height="${ph}" fill="${bg}"/>`;
+    for (const [cat, g] of groups) {
+      out += `<text x="${pad + 6}" y="${y0 + 16}" fill="${fg}" ${T} font-size="13" font-weight="bold">${cat.toUpperCase()}</text>`;
+      y0 += hh;
+      g.forEach((ic, i) => {
+        const x = pad + (i % cols) * cw, y = y0 + Math.floor(i / cols) * ch;
+        out += `<use href="#s-${ic.name}" x="${x + 6}" y="${y + 6}" width="64" height="64"/>`;
+        out += `<use href="#s-${ic.name}" x="${x + 78}" y="${y + 26}" width="24" height="24"/>`;
+        out += `<text x="${x + cw / 2}" y="${y + 88}" fill="${fg}" ${T} font-size="11" text-anchor="middle">${ic.name}</text>`;
+      });
+      y0 += Math.ceil(g.length / cols) * ch;
+    }
   });
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${pw} ${ph * 2}" width="${pw}" height="${ph * 2}"><defs>${syms}</defs>${out}</svg>\n`;
 }
