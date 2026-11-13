@@ -1,0 +1,372 @@
+[
+  {
+    "name": "clear-day",
+    "title": "Clear day",
+    "category": "weather",
+    "tags": [
+      "sun",
+      "sunny",
+      "clear",
+      "day"
+    ],
+    "owm": [
+      "01d"
+    ],
+    "owmIds": [
+      800
+    ]
+  },
+  {
+    "name": "clear-night",
+    "title": "Clear night",
+    "category": "weather",
+    "tags": [
+      "moon",
+      "night",
+      "clear",
+      "stars"
+    ],
+    "owm": [
+      "01n"
+    ],
+    "owmIds": [
+      800
+    ]
+  },
+  {
+    "name": "partly-cloudy-day",
+    "title": "Partly cloudy day",
+    "category": "weather",
+    "tags": [
+      "sun",
+      "cloud",
+      "partly",
+      "few clouds",
+      "day"
+    ],
+    "owm": [
+      "02d"
+    ],
+    "owmIds": [
+      801
+    ]
+  },
+  {
+    "name": "partly-cloudy-night",
+    "title": "Partly cloudy night",
+    "category": "weather",
+    "tags": [
+      "moon",
+      "cloud",
+      "partly",
+      "few clouds",
+      "night"
+    ],
+    "owm": [
+      "02n"
+    ],
+    "owmIds": [
+      801
+    ]
+  },
+  {
+    "name": "cloudy",
+    "title": "Cloudy",
+    "category": "weather",
+    "tags": [
+      "cloud",
+      "clouds",
+      "scattered clouds"
+    ],
+    "owm": [
+      "03d",
+      "03n"
+    ],
+    "owmIds": [
+      802
+    ]
+  },
+  {
+    "name": "overcast",
+    "title": "Overcast",
+    "category": "weather",
+    "tags": [
+      "clouds",
+      "overcast",
+      "broken clouds",
+      "grey"
+    ],
+    "owm": [
+      "04d",
+      "04n"
+    ],
+    "owmIds": [
+      803,
+      804
+    ]
+  },
+  {
+    "name": "fog",
+    "title": "Fog",
+    "category": "weather",
+    "tags": [
+      "fog",
+      "mist",
+      "haze",
+      "smoke"
+    ],
+    "owm": [
+      "50d",
+      "50n"
+    ],
+    "owmIds": [
+      701,
+      711,
+      721,
+      741
+    ]
+  },
+  {
+    "name": "drizzle",
+    "title": "Drizzle",
+    "category": "weather",
+    "tags": [
+      "drizzle",
+      "light rain",
+      "rain"
+    ],
+    "owm": [],
+    "owmIds": [
+      300,
+      301,
+      302,
+      310,
+      311,
+      312,
+      313,
+      314,
+      321
+    ]
+  },
+  {
+    "name": "rain",
+    "title": "Rain",
+    "category": "weather",
+    "tags": [
+      "rain",
+      "rainy",
+      "drops"
+    ],
+    "owm": [
+      "09d",
+      "09n"
+    ],
+    "owmIds": [
+      500,
+      501
+    ]
+  },
+  {
+    "name": "heavy-rain",
+    "title": "Heavy rain",
+    "category": "weather",
+    "tags": [
+      "heavy rain",
+      "downpour",
+      "rain",
+      "storm"
+    ],
+    "owm": [],
+    "owmIds": [
+      502,
+      503,
+      504,
+      522,
+      531
+    ]
+  },
+  {
+    "name": "showers-day",
+    "title": "Showers (day)",
+    "category": "weather",
+    "tags": [
+      "showers",
+      "rain",
+      "sun",
+      "day"
+    ],
+    "owm": [
+      "10d"
+    ],
+    "owmIds": [
+      520,
+      521
+    ]
+  },
+  {
+    "name": "showers-night",
+    "title": "Showers (night)",
+    "category": "weather",
+    "tags": [
+      "showers",
+      "rain",
+      "moon",
+      "night"
+    ],
+    "owm": [
+      "10n"
+    ],
+    "owmIds": [
+      520,
+      521
+    ]
+  },
+  {
+    "name": "thunderstorms",
+    "title": "Thunderstorms",
+    "category": "weather",
+    "tags": [
+      "thunder",
+      "lightning",
+      "storm",
+      "bolt"
+    ],
+    "owm": [],
+    "owmIds": [
+      210,
+      211,
+      212,
+      221
+    ]
+  },
+  {
+    "name": "thunderstorms-rain",
+    "title": "Thunderstorms with rain",
+    "category": "weather",
+    "tags": [
+      "thunder",
+      "lightning",
+      "storm",
+      "rain"
+    ],
+    "owm": [
+      "11d",
+      "11n"
+    ],
+    "owmIds": [
+      200,
+      201,
+      202,
+      230,
+      231,
+      232
+    ]
+  },
+  {
+    "name": "sleet",
+    "title": "Sleet",
+    "category": "weather",
+    "tags": [
+      "sleet",
+      "freezing rain",
+      "rain and snow",
+      "ice"
+    ],
+    "owm": [],
+    "owmIds": [
+      511,
+      611,
+      612,
+      613,
+      615,
+      616
+    ]
+  },
+  {
+    "name": "snow",
+    "title": "Snow",
+    "category": "weather",
+    "tags": [
+      "snow",
+      "snowflake",
+      "winter"
+    ],
+    "owm": [
+      "13d",
+      "13n"
+    ],
+    "owmIds": [
+      600,
+      601,
+      620,
+      621
+    ]
+  },
+  {
+    "name": "heavy-snow",
+    "title": "Heavy snow",
+    "category": "weather",
+    "tags": [
+      "heavy snow",
+      "blizzard",
+      "snow",
+      "winter"
+    ],
+    "owm": [],
+    "owmIds": [
+      602,
+      622
+    ]
+  },
+  {
+    "name": "hail",
+    "title": "Hail",
+    "category": "weather",
+    "tags": [
+      "hail",
+      "ice",
+      "storm"
+    ],
+    "owm": [],
+    "owmIds": [
+      906
+    ]
+  },
+  {
+    "name": "wind",
+    "title": "Wind",
+    "category": "weather",
+    "tags": [
+      "wind",
+      "windy",
+      "breeze",
+      "gale",
+      "squall"
+    ],
+    "owm": [],
+    "owmIds": [
+      771,
+      781,
+      905,
+      957
+    ]
+  },
+  {
+    "name": "dust",
+    "title": "Dust",
+    "category": "weather",
+    "tags": [
+      "dust",
+      "sand",
+      "sandstorm",
+      "haze"
+    ],
+    "owm": [],
+    "owmIds": [
+      731,
+      751,
+      761,
+      762
+    ]
+  }
+]

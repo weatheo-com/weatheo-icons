@@ -1,0 +1,17 @@
+{
+  "name": "weatheo-icons",
+  "version": "0.1.0",
+  "description": "Original animated and static SVG weather icons by Weatheo",
+  "license": "MIT",
+  "homepage": "https://weatheo.com/en/icons",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/weatheo-com/weatheo-icons.git"
+  },
+  "files": ["svg", "icons.json"],
+  "keywords": ["weather", "icons", "svg", "animated", "weather-icons", "openweather", "forecast", "css-animation"],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs --check"
+  }
+}
